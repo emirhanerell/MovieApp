@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movieapplication"
+    namespace = "com.example.movieapp"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.movieapplication"
+        applicationId = "com.example.movieapp"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -29,10 +29,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
     buildFeatures {
         viewBinding = true
     }
+
 }
 
 dependencies {

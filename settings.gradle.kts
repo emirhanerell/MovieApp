@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven ("https://jitpack.io" )
     }
 }
 dependencyResolutionManagement {
@@ -20,6 +21,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MovieApplication"
+rootProject.name = "MovieApp"
 include(":app")
  
