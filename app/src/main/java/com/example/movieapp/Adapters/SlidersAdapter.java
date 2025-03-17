@@ -19,8 +19,7 @@ import com.example.movieapp.Domains.SliderItems;
 import com.example.movieapp.R;
 
 import java.util.List;
-
-public class SlidersAdapter extends RecyclerView.Adapter<SlidersAdapter.SliderViewHolder> {
+public class SlidersAdapter extends RecyclerView.Adapter<SlidersAdapter.SliderViewholder> {
     private List<SliderItems> sliderItems;
     private ViewPager2 viewPager2;
     private Context context;
@@ -32,20 +31,24 @@ public class SlidersAdapter extends RecyclerView.Adapter<SlidersAdapter.SliderVi
         }
     };
 
-    private SlidersAdapter(List<SliderItems> sliderItems,ViewPager2 viewPager2) {
+    public SlidersAdapter(List<SliderItems> sliderItems, ViewPager2 viewPager2) {
         this.sliderItems = sliderItems;
         this.viewPager2 = viewPager2;
     }
 
     @NonNull
     @Override
-    public SlidersAdapter.SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //return new SliderViewHolder(LayoutInflater.from(parent.getContext()).inflate(androidx.core.R.layout.slider_viewholder,parent,false));
-        return null;
+    public SlidersAdapter.SliderViewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        return new SliderViewholder(LayoutInflater.from(parent.getContext()).inflate(R.layout.slider_viewholder, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull SlidersAdapter.SliderViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SlidersAdapter.SliderViewholder holder, int position) {
+        holder.setImage(sliderItems.get(position));
+        if (position == sliderItems.size() - 2) {
+            viewPager2.post(runnable);
+        }
     }
 
     @Override
@@ -53,10 +56,11 @@ public class SlidersAdapter extends RecyclerView.Adapter<SlidersAdapter.SliderVi
         return sliderItems.size();
     }
 
-    public class SliderViewHolder extends RecyclerView.ViewHolder {
+    public class SliderViewholder extends RecyclerView.ViewHolder {
         private ImageView imageView;
-        private TextView nameTxt,genreTxt,ageTxt,yearTxt,timeTxt;
-        public SliderViewHolder(@NonNull View itemView) {
+        private TextView nameTxt, genreTxt, ageTxt, yearTxt, timeTxt;
+
+        public SliderViewholder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageSlide);
             nameTxt = itemView.findViewById(R.id.nameTxt);
@@ -68,12 +72,16 @@ public class SlidersAdapter extends RecyclerView.Adapter<SlidersAdapter.SliderVi
 
         void setImage(SliderItems sliderItems) {
             RequestOptions requestOptions = new RequestOptions();
-            requestOptions = requestOptions.transform(new CenterCrop(),new RoundedCorners(60));
-            Glide.with(context).load(sliderItems.getImage()).apply(requestOptions).into(imageView);
+            requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(60));
+            Glide.with(context)
+                    .load(sliderItems.getImage())
+                    .apply(requestOptions)
+                    .into(imageView);
+
             nameTxt.setText(sliderItems.getName());
             genreTxt.setText(sliderItems.getGenre());
             ageTxt.setText(sliderItems.getAge());
-            yearTxt.setText(sliderItems.getYear());
+            yearTxt.setText("" + sliderItems.getYear());
             timeTxt.setText(sliderItems.getTime());
         }
     }
