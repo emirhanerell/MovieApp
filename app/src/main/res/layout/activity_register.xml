@@ -28,6 +28,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/registerTxt"
                 android:text="@string/register"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -40,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email"
+                    android:id="@+id/emailTxt"
                     android:hint="@string/email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -50,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password"
+                    android:id="@+id/passwordTxt"
                     android:hint="@string/password"
                     android:inputType="textPassword"
                     android:layout_width="match_parent"

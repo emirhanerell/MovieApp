@@ -11,9 +11,13 @@ import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
@@ -22,18 +26,33 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.movieapp.Adapters.CastListAdapter;
 import com.example.movieapp.Adapters.CategoryEachFilmAdapter;
 import com.example.movieapp.Domains.Film;
-import com.example.movieapp.databinding.ActivityDetailBinding;
+import com.example.movieapp.R;
 
+import eightbitlab.com.blurview.BlurView;
 import eightbitlab.com.blurview.RenderScriptBlur;
 
 public class DetailActivity extends AppCompatActivity {
-    private ActivityDetailBinding binding;
-
+    private ImageView filmPic;
+    private TextView titleTxt, imdbTxt, movieTimesTxt, movieSummery;
+    private Button watchTrailerBtn;
+    private ImageView backImg;
+    private BlurView blurView;
+    private RecyclerView genreView, CastView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityDetailBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        setContentView(R.layout.activity_detail);
+
+        filmPic = findViewById(R.id.filmPic);
+        titleTxt = findViewById(R.id.titleTxt);
+        imdbTxt = findViewById(R.id.imdbTxt);
+        movieTimesTxt = findViewById(R.id.movieTimesTxt);
+        movieSummery = findViewById(R.id.movieSummery);
+        watchTrailerBtn = findViewById(R.id.watchTrailerBtn);
+        backImg = findViewById(R.id.backImg);
+        blurView = findViewById(R.id.blurView);
+        genreView = findViewById(R.id.genreView);
+        CastView = findViewById(R.id.CastView);
 
         setVariable();
 
@@ -51,14 +70,14 @@ public class DetailActivity extends AppCompatActivity {
         Glide.with(this)
                 .load(item.getPoster())
                 .apply(requestOptions)
-                .into(binding.filmPic);
+                .into(filmPic);
 
-        binding.titleTxt.setText(item.getTitle());
-        binding.imdbTxt.setText("IMDB " + item.getImdb());
-        binding.movieTimesTxt.setText(item.getYear() + " - " + item.getTime());
-        binding.movieSummery.setText(item.getDescription());
+        titleTxt.setText(item.getTitle());
+        imdbTxt.setText("IMDB " + item.getImdb());
+        movieTimesTxt.setText(item.getYear() + " - " + item.getTime());
+        movieSummery.setText(item.getDescription());
 
-        binding.watchTrailerBtn.setOnClickListener(new View.OnClickListener() {
+        watchTrailerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String id = item.getTrailer().replace("https://www.youtube.com/watch?v=", "");
@@ -72,27 +91,27 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
-        binding.backImg.setOnClickListener(v -> finish());
+        backImg.setOnClickListener(v -> finish());
 
         float radius = 10f;
         View decorView = getWindow().getDecorView();
         ViewGroup rootView = (ViewGroup) decorView.findViewById(android.R.id.content);
         Drawable windowsBackground = decorView.getBackground();
 
-        binding.blurView.setupWith(rootView, new RenderScriptBlur(this))
+        blurView.setupWith(rootView, new RenderScriptBlur(this))
                 .setFrameClearDrawable(windowsBackground)
                 .setBlurRadius(radius);
-        binding.blurView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
-        binding.blurView.setClipToOutline(true);
+        blurView.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
+        blurView.setClipToOutline(true);
 
         if (item.getGenre() != null) {
-            binding.genreView.setAdapter(new CategoryEachFilmAdapter(item.getGenre()));
-            binding.genreView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            genreView.setAdapter(new CategoryEachFilmAdapter(item.getGenre()));
+            genreView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         }
 
         if (item.getCasts() != null) {
-            binding.CastView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            binding.CastView.setAdapter(new CastListAdapter(item.getCasts()));
+            CastView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            CastView.setAdapter(new CastListAdapter(item.getCasts()));
         }
     }
 }

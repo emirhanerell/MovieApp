@@ -29,10 +29,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    buildFeatures{
-        viewBinding = true
-    }
-
 }
 
 dependencies {
@@ -50,4 +46,5 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
     implementation("com.github.Dimezis:BlurView:version-2.0.3")
+    implementation ("com.google.firebase:firebase-database:20.3.0")
 }
