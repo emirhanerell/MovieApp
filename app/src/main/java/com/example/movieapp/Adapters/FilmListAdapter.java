@@ -20,6 +20,7 @@ import com.example.movieapp.Domains.Film;
 import com.example.movieapp.R;
 
 import java.util.ArrayList;
+
 public class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.Viewholder> {
     ArrayList<Film> items;
     Context context;
@@ -31,14 +32,14 @@ public class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.Viewho
 
     @NonNull
     @Override
-    public FilmListAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.film_viewholder, parent, false);
         return new Viewholder(inflate);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FilmListAdapter.Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         holder.titleTxt.setText(items.get(position).getTitle());
         RequestOptions requestOptions = new RequestOptions();
         requestOptions = requestOptions.transform(new CenterCrop(), new RoundedCorners(30));

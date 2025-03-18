@@ -23,14 +23,14 @@ public class CategoryEachFilmAdapter extends RecyclerView.Adapter<CategoryEachFi
 
     @NonNull
     @Override
-    public CategoryEachFilmAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_category, parent, false);
         return new Viewholder(inflate);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategoryEachFilmAdapter.Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         holder.titleTxt.setText(items.get(position));
     }
 
