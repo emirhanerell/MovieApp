@@ -25,14 +25,14 @@ public class CastListAdapter extends RecyclerView.Adapter<CastListAdapter.Viewho
 
     @NonNull
     @Override
-    public CastListAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.viewholder_actors, parent, false);
         return new Viewholder(inflate);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CastListAdapter.Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         Glide.with(context)
                 .load(casts.get(position).getPicUrl())
                 .into(holder.pic);

@@ -1,6 +1,5 @@
 package com.example.movieapp.Activities;
 
-
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
