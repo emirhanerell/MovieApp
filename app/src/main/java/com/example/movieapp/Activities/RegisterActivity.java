@@ -9,12 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.movieapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,18 +19,22 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    TextInputEditText editTextEmail, editTextPassword;
-    Button buttonRef;
+    TextInputEditText editTextName, editTextSurname, editTextEmail, editTextPassword;
+    Button buttonRegister;
     FirebaseAuth mAuth;
+    FirebaseFirestore db;
     ProgressBar progressBar;
     TextView textView;
 
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
             Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -49,9 +49,13 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance(); // Firestore bağlantısı
+
+        editTextName = findViewById(R.id.nameTxt);
+        editTextSurname = findViewById(R.id.surnameTxt);
         editTextEmail = findViewById(R.id.emailTxt);
         editTextPassword = findViewById(R.id.passwordTxt);
-        buttonRef = findViewById(R.id.btn_register);
+        buttonRegister = findViewById(R.id.btn_register);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.loginNow);
 
@@ -64,27 +68,44 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        buttonRef.setOnClickListener(new View.OnClickListener() {
+        buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
-                String email, password;
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
 
+                String name, surname, email, password;
+                name = String.valueOf(editTextName.getText()).trim();
+                surname = String.valueOf(editTextSurname.getText()).trim();
+                email = String.valueOf(editTextEmail.getText()).trim();
+                password = String.valueOf(editTextPassword.getText()).trim();
+
+                if (TextUtils.isEmpty(name)) {
+                    Toast.makeText(RegisterActivity.this, "İsim giriniz", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
+                if (TextUtils.isEmpty(surname)) {
+                    Toast.makeText(RegisterActivity.this, "Soyisim giriniz", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
+                    return;
+                }
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(RegisterActivity.this, "Mail Giriniz", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Email giriniz", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (TextUtils.isEmpty(password)){
-                    Toast.makeText(RegisterActivity.this, "Şifre Giriniz", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Şifre giriniz", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
                 if (password.length() < 6){
                     Toast.makeText(RegisterActivity.this, "Şifre 6 karakterden küçük olamaz", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
 
+                // Firebase Authentication ile kullanıcı kaydı
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -92,19 +113,36 @@ public class RegisterActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
                                     FirebaseUser user = mAuth.getCurrentUser();
-                                    Toast.makeText(RegisterActivity.this, "Başarılı bir şekilde kayıt oldunuz",
-                                            Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                    startActivity(intent);
-                                    finish();
+                                    if (user != null) {
+                                        // Kullanıcı bilgilerini Firestore'a kaydetme
+                                        String userId = user.getUid();
+                                        Map<String, Object> userMap = new HashMap<>();
+                                        userMap.put("name", name);
+                                        userMap.put("surname", surname);
+                                        userMap.put("email", email);
+                                        userMap.put("uid", userId);
+
+                                        db.collection("Users").document(userId)
+                                                .set(userMap)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Toast.makeText(RegisterActivity.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                                            startActivity(intent);
+                                                            finish();
+                                                        } else {
+                                                            Toast.makeText(RegisterActivity.this, "Veri kaydı başarısız oldu!", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                    }
                                 } else {
-                                    Toast.makeText(RegisterActivity.this, "Kayıt başarısız oldu",
-                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, "Kayıt başarısız oldu", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
-
-
             }
         });
     }

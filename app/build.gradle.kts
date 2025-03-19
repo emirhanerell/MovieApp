@@ -46,5 +46,12 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
     implementation("com.github.Dimezis:BlurView:version-2.0.3")
-    implementation ("com.google.firebase:firebase-database:20.3.0")
+    implementation ("com.google.firebase:firebase-database:21.0.0")
+    implementation ("com.google.firebase:firebase-firestore:25.1.2")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")  // API'yi bağlamak için
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 }

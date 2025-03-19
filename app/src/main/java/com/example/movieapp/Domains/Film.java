@@ -88,4 +88,8 @@ public class Film implements Serializable {
     public void setCasts(ArrayList<Cast> casts) {
         Casts = casts;
     }
+
+    public void setPicUrl(String posterPath) {
+        Poster = posterPath;
+    }
 }
