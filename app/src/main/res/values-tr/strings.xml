@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_password">Şifre Değiştir</string>
+    <string name="dark_mode">Karanlık Mod</string>
+    <string name="privacy_policy">Gizlilik Politikası</string>
+    <string name="terms_of_service">Kullanım Koşulları</string>
+    <string name="contact_us">Bize Ulaşın</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="language">Dil (TR/EN)</string>
+</resources> 

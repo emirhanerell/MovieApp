@@ -1,7 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MovieApp</string>
-    <string name="login">Giriş Yap</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
     <string name="email">Email</string>
-    <string name="password">Şifre</string>
-    <string name="register">Kayıt Ol</string>
+    <string name="password">Password</string>
+    
+    <!-- Profile Activity Strings -->
+    <string name="change_password">Change Password</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="logout">Logout</string>
+    <string name="language">Language (TR/EN)</string>
 </resources>

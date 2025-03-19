@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Film implements Serializable {
+    private int Id;
     private String Title;
     private String Description;
     private String Poster;
@@ -15,6 +16,14 @@ public class Film implements Serializable {
     private ArrayList<Cast> Casts;
 
     public Film() {
+    }
+
+    public int getId() {
+        return Id;
+    }
+
+    public void setId(int id) {
+        Id = id;
     }
 
     public String getTitle() {

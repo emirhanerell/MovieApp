@@ -3,11 +3,16 @@ package com.example.movieapp.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,12 +25,15 @@ import com.example.movieapp.Adapters.FilmListAdapter;
 import com.example.movieapp.Adapters.SlidersAdapter;
 import com.example.movieapp.Domains.Cast;
 import com.example.movieapp.Domains.Movie;
+import com.example.movieapp.Domains.MovieDetail;
 import com.example.movieapp.Dto.MovieResponse;
 import com.example.movieapp.Api.TMDBApi;
 import com.example.movieapp.Domains.Film;
 import com.example.movieapp.Domains.SliderItems;
 import com.example.movieapp.R;
+import com.example.movieapp.Utils.ThemeHelper;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +46,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
+
 public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
-    private static final String API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3YTkwOTBkNzc5YzcyODFiZTg0MTcxOWExNzlmOTAzZSIsIm5iZiI6MTc0MjM4NjA2OS4yMjU5OTk4LCJzdWIiOiI2N2RhYjM5NTdiYTdkYTcxNjNhMWU5OTUiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.gSwO3mJcY0WjsD7RCRrVQ4Zij2Rw4NdzCkTRHDikMls"; // Replace with your actual API key
+    private static final String API_KEY = "7a9090d779c7281be841719a179f903e"; // Replace with your actual API key
     
     private Handler sliderHandler = new Handler();
     private Runnable sliderRunnable;
@@ -48,10 +58,17 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBarBanner, progressBarTop, progressBarUpcoming;
     private RecyclerView recyclerViewTopMovies, recyclerViewUpcoming;
     private ImageView profileImageView;
+    private TextView userNameText, userEmailText;
     private TMDBApi tmdbApi;
+    private EditText searchEditText;
+    private RecyclerView searchResultsRecyclerView;
+    private ProgressBar searchProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Tema ayarını uygula
+        ThemeHelper.applyTheme(ThemeHelper.isDarkMode(this));
+        
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -60,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
         setupProfileImage();
         setupWindowFlags();
         setupSliderRunnable();
+        displayUserName();
+        setupBottomNavigation();
 
         initBanner();
         initTopMoving();
@@ -97,6 +116,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewTopMovies = findViewById(R.id.recyclerViewTopMovies);
         recyclerViewUpcoming = findViewById(R.id.recyclerViewUpcoming);
         profileImageView = findViewById(R.id.imageView2);
+        userNameText = findViewById(R.id.userNameText);
+        userEmailText = findViewById(R.id.userEmailText);
+        searchEditText = findViewById(R.id.editTextText);
+        searchResultsRecyclerView = findViewById(R.id.searchResultsRecyclerView);
+        searchProgressBar = findViewById(R.id.searchProgressBar);
+
+        setupSearchFunctionality();
     }
 
     private void setupProfileImage() {
@@ -117,16 +143,120 @@ public class MainActivity extends AppCompatActivity {
         sliderRunnable = () -> viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
     }
 
+    private void displayUserName() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        
+        if (auth.getCurrentUser() != null) {
+            // Email'i doğrudan Firebase Auth'dan al
+            String email = auth.getCurrentUser().getEmail();
+            if (email != null) {
+                userEmailText.setText(email);
+            }
+
+            // İsim ve soyismi Firestore'dan al
+            String userId = auth.getCurrentUser().getUid();
+            db.collection("Users").document(userId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("name");
+                            String surname = documentSnapshot.getString("surname");
+                            if (name != null && surname != null) {
+                                userNameText.setText("Hello " + name + " " + surname);
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Firestore'dan veri alınamazsa email'i göster
+                        if (email != null) {
+                            userNameText.setText("Hello " + email.split("@")[0]);
+                        }
+                    });
+        }
+    }
+
+    private void setupSearchFunctionality() {
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            private Handler handler = new Handler();
+            private Runnable searchRunnable;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (searchRunnable != null) {
+                    handler.removeCallbacks(searchRunnable);
+                }
+
+                searchRunnable = () -> {
+                    String query = s.toString().trim();
+                    if (!query.isEmpty()) {
+                        performSearch(query);
+                    } else {
+                        // Arama boşsa, normal film listelerini göster
+                        searchResultsRecyclerView.setVisibility(View.GONE);
+                        viewPager2.setVisibility(View.VISIBLE);
+                        recyclerViewTopMovies.setVisibility(View.VISIBLE);
+                        recyclerViewUpcoming.setVisibility(View.VISIBLE);
+                    }
+                };
+
+                // 500ms gecikme ile arama yap (kullanıcı yazmayı bitirene kadar bekle)
+                handler.postDelayed(searchRunnable, 500);
+            }
+        });
+    }
+
+    private void performSearch(String query) {
+        searchProgressBar.setVisibility(View.VISIBLE);
+        
+        // Arama yapılırken diğer film listelerini gizle
+        viewPager2.setVisibility(View.GONE);
+        recyclerViewTopMovies.setVisibility(View.GONE);
+        recyclerViewUpcoming.setVisibility(View.GONE);
+        searchResultsRecyclerView.setVisibility(View.VISIBLE);
+
+        tmdbApi.searchMovies(API_KEY, query, "credits,release_dates").enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Movie> movies = response.body().getResults();
+                    if (!movies.isEmpty()) {
+                        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                        searchResultsRecyclerView.setAdapter(new FilmListAdapter(convertToFilmList(movies, searchResultsRecyclerView)));
+                    } else {
+                        // Sonuç bulunamadığında kullanıcıya bilgi ver
+                        Toast.makeText(MainActivity.this, "No movies found", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Search failed", Toast.LENGTH_SHORT).show();
+                }
+                searchProgressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                searchProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
     private void initUpcoming() {
         progressBarUpcoming.setVisibility(View.VISIBLE);
-        tmdbApi.getUpcomingMovies("Bearer " + API_KEY).enqueue(new Callback<MovieResponse>() {
+        tmdbApi.getUpcomingMovies(API_KEY, "credits,release_dates").enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Movie> movies = response.body().getResults();
                     if (!movies.isEmpty()) {
                         recyclerViewUpcoming.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                        recyclerViewUpcoming.setAdapter(new FilmListAdapter(convertToFilmList(movies)));
+                        recyclerViewUpcoming.setAdapter(new FilmListAdapter(convertToFilmList(movies, recyclerViewUpcoming)));
                     } else {
                         System.out.println("Yaklaşan filmler listesi boş!");
                     }
@@ -152,14 +282,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void initTopMoving() {
         progressBarTop.setVisibility(View.VISIBLE);
-        tmdbApi.getTopRatedMovies("Bearer " + API_KEY).enqueue(new Callback<MovieResponse>() {
+        tmdbApi.getTopRatedMovies(API_KEY, "credits,release_dates").enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Movie> movies = response.body().getResults();
                     if (!movies.isEmpty()) {
                         recyclerViewTopMovies.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                        recyclerViewTopMovies.setAdapter(new FilmListAdapter(convertToFilmList(movies)));
+                        recyclerViewTopMovies.setAdapter(new FilmListAdapter(convertToFilmList(movies, recyclerViewTopMovies)));
                     } else {
                         System.out.println("En iyi filmler listesi boş!");
                     }
@@ -185,7 +315,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initBanner() {
         progressBarBanner.setVisibility(View.VISIBLE);
-        tmdbApi.getPopularMovies("Bearer " + API_KEY).enqueue(new Callback<MovieResponse>() {
+        tmdbApi.getPopularMovies(API_KEY, "credits,release_dates").enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -215,33 +345,92 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private ArrayList<Film> convertToFilmList(List<Movie> movies) {
+    private void loadMovieDetails(Movie movie, Film film, ArrayList<Film> films, RecyclerView recyclerView) {
+        tmdbApi.getMovieDetails(movie.getId(), API_KEY, "credits,release_dates").enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieDetail detail = response.body();
+                    film.setTime(detail.getRuntime() + " dk");
+                    
+                    // Genre listesini güncelle
+                    ArrayList<String> genres = new ArrayList<>();
+                    if (detail.getGenres() != null) {
+                        for (MovieDetail.Genre genre : detail.getGenres()) {
+                            genres.add(genre.getName());
+                        }
+                    }
+                    film.setGenre(genres);
+                    
+                    // Cast listesini güncelle
+                    ArrayList<Cast> casts = new ArrayList<>();
+                    if (detail.getCredits() != null && detail.getCredits().getCast() != null) {
+                        for (MovieDetail.Cast apiCast : detail.getCredits().getCast()) {
+                            Cast cast = new Cast();
+                            cast.setActor(apiCast.getName());
+                            cast.setPicUrl(apiCast.getProfilePath());
+                            casts.add(cast);
+                        }
+                    }
+                    film.setCasts(casts);
+                    
+                    // Adapter'ı güncelle
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                System.out.println("Film detayları alınamadı: " + t.getMessage());
+            }
+        });
+    }
+
+    private void loadMovieDetailsForSlider(Movie movie, SliderItems item, ArrayList<SliderItems> items, ViewPager2 viewPager) {
+        tmdbApi.getMovieDetails(movie.getId(), API_KEY, "credits,release_dates").enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieDetail detail = response.body();
+                    item.setTime(detail.getRuntime() + " dk");
+                    
+                    if (detail.getGenres() != null && !detail.getGenres().isEmpty()) {
+                        item.setGenre(detail.getGenres().get(0).getName());
+                    }
+                    
+                    // Adapter'ı güncelle
+                    viewPager.getAdapter().notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                System.out.println("Film detayları alınamadı: " + t.getMessage());
+            }
+        });
+    }
+
+    private ArrayList<Film> convertToFilmList(List<Movie> movies, RecyclerView recyclerView) {
         ArrayList<Film> films = new ArrayList<>();
         for (Movie movie : movies) {
             Film film = new Film();
+            film.setId(movie.getId());
             film.setTitle(movie.getTitle());
             film.setPicUrl(movie.getPosterPath());
             film.setDescription(movie.getOverview());
             film.setImdb((int) movie.getVoteAverage());
-            film.setYear(2024); // Varsayılan yıl
-            film.setTime("120 dk"); // Varsayılan süre
+            
+            // Yıl bilgisini release_date'den al (format: YYYY-MM-DD)
+            String releaseDate = movie.getReleaseDate();
+            if (releaseDate != null && releaseDate.length() >= 4) {
+                film.setYear(Integer.parseInt(releaseDate.substring(0, 4)));
+            }
+            
             film.setTrailer("https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Varsayılan trailer
-            
-            // Varsayılan genre listesi
-            ArrayList<String> genres = new ArrayList<>();
-            genres.add("Aksiyon");
-            genres.add("Macera");
-            film.setGenre(genres);
-            
-            // Varsayılan cast listesi
-            ArrayList<Cast> casts = new ArrayList<>();
-            Cast cast = new Cast();
-            cast.setActor("Oyuncu Adı");
-            cast.setPicUrl("https://image.tmdb.org/t/p/w500/actor.jpg");
-            casts.add(cast);
-            film.setCasts(casts);
-            
             films.add(film);
+            
+            // Her film için detay bilgilerini yükle
+            loadMovieDetails(movie, film, films, recyclerView);
         }
         return films;
     }
@@ -252,11 +441,19 @@ public class MainActivity extends AppCompatActivity {
             SliderItems item = new SliderItems();
             item.setImageUrl(movie.getBackdropPath());
             item.setTitle(movie.getTitle());
-            item.setGenre("Film");
+            
+            // Yıl bilgisini release_date'den al
+            String releaseDate = movie.getReleaseDate();
+            if (releaseDate != null && releaseDate.length() >= 4) {
+                item.setYear(releaseDate.substring(0, 4));
+            }
+            
+            item.setGenre("Film"); // Geçici değer, detaylar gelince güncellenecek
             item.setAge("13+");
-            item.setYear("2024");
-            item.setTime("120 dk");
             items.add(item);
+            
+            // Her film için detay bilgilerini yükle
+            loadMovieDetailsForSlider(movie, item, items, viewPager2);
         }
         return items;
     }
@@ -282,6 +479,23 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 sliderHandler.removeCallbacks(sliderRunnable);
+            }
+        });
+    }
+
+    private void setupBottomNavigation() {
+        ChipNavigationBar bottomNav = findViewById(R.id.bottom_menu);
+        bottomNav.setItemSelected(R.id.explorer, true);
+
+        bottomNav.setOnItemSelectedListener(id -> {
+            if (id == R.id.explorer) {
+                // Ana sayfadayız, bir şey yapmaya gerek yok
+            } else if (id == R.id.favorites) {
+                Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show();
+            } else if (id == R.id.cart) {
+                Toast.makeText(this, "Cart coming soon!", Toast.LENGTH_SHORT).show();
+            } else if (id == R.id.profile) {
+                startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             }
         });
     }

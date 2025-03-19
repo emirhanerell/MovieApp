@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Movies Center"
-                android:textColor="@color/white"
+                android:textColor="@color/text_color"
                 android:textAlignment="center"
                 android:textSize="40sp"
                 android:textStyle="bold|italic"
@@ -48,7 +48,7 @@
                 android:text="Yüzlerce premium TV programı ve film, sizi bekliyor!\n
 Hemen izlemeye başlayın ve eğlencenin tadını çıkarın."
                 android:textAlignment="center"
-                android:textColor="@color/white"
+                android:textColor="@color/text_color"
                 android:textSize="20sp" />
 
             <androidx.appcompat.widget.AppCompatButton
