@@ -1,6 +1,8 @@
 package com.example.movieapp.Activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -33,10 +35,12 @@ import com.example.movieapp.Domains.SliderItems;
 import com.example.movieapp.R;
 import com.example.movieapp.Utils.ThemeHelper;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -48,9 +52,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
+import android.content.SharedPreferences;
+import android.util.DisplayMetrics;
+
 public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://api.themoviedb.org/3/";
-    private static final String API_KEY = "7a9090d779c7281be841719a179f903e"; // Replace with your actual API key
+    private static final String API_KEY = "7a9090d779c7281be841719a179f903e";
     
     private Handler sliderHandler = new Handler();
     private Runnable sliderRunnable;
@@ -66,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Dil ayarını uygula
+        SharedPreferences sharedPreferences = getSharedPreferences("Settings", MODE_PRIVATE);
+        boolean isTurkish = sharedPreferences.getBoolean("isTurkish", false);
+        Locale locale = isTurkish ? new Locale("tr") : new Locale("en");
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        Configuration conf = res.getConfiguration();
+        conf.setLocale(locale);
+        res.updateConfiguration(conf, dm);
+        
         // Tema ayarını uygula
         ThemeHelper.applyTheme(ThemeHelper.isDarkMode(this));
         
@@ -115,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         progressBarUpcoming = findViewById(R.id.progressBarUpcoming);
         recyclerViewTopMovies = findViewById(R.id.recyclerViewTopMovies);
         recyclerViewUpcoming = findViewById(R.id.recyclerViewUpcoming);
-        profileImageView = findViewById(R.id.imageView2);
+        profileImageView = findViewById(R.id.profileImage);
         userNameText = findViewById(R.id.userNameText);
         userEmailText = findViewById(R.id.userEmailText);
         searchEditText = findViewById(R.id.editTextText);
@@ -144,35 +161,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayUserName() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        
-        if (auth.getCurrentUser() != null) {
-            // Email'i doğrudan Firebase Auth'dan al
-            String email = auth.getCurrentUser().getEmail();
-            if (email != null) {
-                userEmailText.setText(email);
-            }
-
-            // İsim ve soyismi Firestore'dan al
-            String userId = auth.getCurrentUser().getUid();
-            db.collection("Users").document(userId)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String name = documentSnapshot.getString("name");
-                            String surname = documentSnapshot.getString("surname");
-                            if (name != null && surname != null) {
-                                userNameText.setText("Hello " + name + " " + surname);
-                            }
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        // Firestore'dan veri alınamazsa email'i göster
-                        if (email != null) {
-                            userNameText.setText("Hello " + email.split("@")[0]);
-                        }
-                    });
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String email = user.getEmail();
+            userNameText.setText(getString(R.string.hello));
+            userEmailText.setText(email);
         }
     }
 
@@ -195,10 +188,10 @@ public class MainActivity extends AppCompatActivity {
 
                 searchRunnable = () -> {
                     String query = s.toString().trim();
-                    if (!query.isEmpty()) {
+                    if (query.length() >= 2) { // En az 2 karakter girildiğinde aramayı başlat
                         performSearch(query);
                     } else {
-                        // Arama boşsa, normal film listelerini göster
+                        // 2 karakterden az girildiğinde normal film listelerini göster
                         searchResultsRecyclerView.setVisibility(View.GONE);
                         viewPager2.setVisibility(View.VISIBLE);
                         recyclerViewTopMovies.setVisibility(View.VISIBLE);
@@ -206,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 };
 
-                // 500ms gecikme ile arama yap (kullanıcı yazmayı bitirene kadar bekle)
+                // 500ms gecikme ile arama yap
                 handler.postDelayed(searchRunnable, 500);
             }
         });
@@ -221,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewUpcoming.setVisibility(View.GONE);
         searchResultsRecyclerView.setVisibility(View.VISIBLE);
 
-        tmdbApi.searchMovies(API_KEY, query, "credits,release_dates").enqueue(new Callback<MovieResponse>() {
+        tmdbApi.searchMovies(API_KEY, query, "").enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -230,18 +223,17 @@ public class MainActivity extends AppCompatActivity {
                         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                         searchResultsRecyclerView.setAdapter(new FilmListAdapter(convertToFilmList(movies, searchResultsRecyclerView)));
                     } else {
-                        // Sonuç bulunamadığında kullanıcıya bilgi ver
-                        Toast.makeText(MainActivity.this, "No movies found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, getString(R.string.no_movies_found), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "Search failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.search_failed), Toast.LENGTH_SHORT).show();
                 }
                 searchProgressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 searchProgressBar.setVisibility(View.GONE);
             }
         });
@@ -272,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<MovieResponse> call, Throwable t) {
+            public void onFailure(Call<MovieResponse> call, Throwable t) { // Api çağrısı hiç ulaşmamışsa
                 System.out.println("API çağrısı başarısız: " + t.getMessage());
                 t.printStackTrace();
                 progressBarUpcoming.setVisibility(View.GONE);
@@ -426,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
                 film.setYear(Integer.parseInt(releaseDate.substring(0, 4)));
             }
             
-            film.setTrailer("https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Varsayılan trailer
+            film.setTrailer("https://www.youtube.com/watch?v=pGta87S18ZQ");
             films.add(film);
             
             // Her film için detay bilgilerini yükle
@@ -491,9 +483,7 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.explorer) {
                 // Ana sayfadayız, bir şey yapmaya gerek yok
             } else if (id == R.id.favorites) {
-                Toast.makeText(this, "Favorites coming soon!", Toast.LENGTH_SHORT).show();
-            } else if (id == R.id.cart) {
-                Toast.makeText(this, "Cart coming soon!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.favorites_coming_soon), Toast.LENGTH_SHORT).show();
             } else if (id == R.id.profile) {
                 startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             }

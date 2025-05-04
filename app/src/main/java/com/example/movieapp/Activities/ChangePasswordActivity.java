@@ -28,15 +28,15 @@ public class ChangePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
-        initViews();
+        initComponents();
         setupClickListeners();
     }
 
-    private void initViews() {
-        currentPasswordEdit = findViewById(R.id.currentPasswordEdit);
-        newPasswordEdit = findViewById(R.id.newPasswordEdit);
-        confirmPasswordEdit = findViewById(R.id.confirmPasswordEdit);
-        updatePasswordBtn = findViewById(R.id.updatePasswordBtn);
+    private void initComponents() {
+        currentPasswordEdit = findViewById(R.id.currentPasswordEditText);
+        newPasswordEdit = findViewById(R.id.newPasswordEditText);
+        confirmPasswordEdit = findViewById(R.id.confirmPasswordEditText);
+        updatePasswordBtn = findViewById(R.id.changePasswordButton);
         progressBar = findViewById(R.id.progressBar);
         backButton = findViewById(R.id.backBtn);
         auth = FirebaseAuth.getInstance();
@@ -46,75 +46,67 @@ public class ChangePasswordActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         updatePasswordBtn.setOnClickListener(v -> {
-            String currentPassword = currentPasswordEdit.getText().toString().trim();
-            String newPassword = newPasswordEdit.getText().toString().trim();
-            String confirmPassword = confirmPasswordEdit.getText().toString().trim();
-
-            if (validateInputs(currentPassword, newPassword, confirmPassword)) {
-                updatePassword(currentPassword, newPassword);
+            if (validateInputs()) {
+                updatePassword();
             }
         });
     }
 
-    private boolean validateInputs(String currentPassword, String newPassword, String confirmPassword) {
-        if (currentPassword.isEmpty()) {
-            currentPasswordEdit.setError("Enter current password");
-            return false;
-        }
+    private boolean validateInputs() {
+        String currentPassword = currentPasswordEdit.getText().toString().trim();
+        String newPassword = newPasswordEdit.getText().toString().trim();
+        String confirmPassword = confirmPasswordEdit.getText().toString().trim();
 
-        if (newPassword.isEmpty()) {
-            newPasswordEdit.setError("Enter new password");
-            return false;
-        }
-
-        if (confirmPassword.isEmpty()) {
-            confirmPasswordEdit.setError("Confirm new password");
+        if (currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            Toast.makeText(this, getString(R.string.password_empty), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (newPassword.length() < 6) {
-            newPasswordEdit.setError("Password must be at least 6 characters");
+            Toast.makeText(this, getString(R.string.password_short), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            confirmPasswordEdit.setError("Passwords do not match");
+            Toast.makeText(this, getString(R.string.password_mismatch), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (newPassword.equals(currentPassword)) {
+            Toast.makeText(this, getString(R.string.password_same), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         return true;
     }
 
-    private void updatePassword(String currentPassword, String newPassword) {
-        progressBar.setVisibility(View.VISIBLE);
+    private void updatePassword() {
+        String currentPassword = currentPasswordEdit.getText().toString().trim();
+        String newPassword = newPasswordEdit.getText().toString().trim();
+
         FirebaseUser user = auth.getCurrentUser();
-        
         if (user != null && user.getEmail() != null) {
-            // Önce mevcut kimlik bilgilerini doğrula
             AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
-            
+
             user.reauthenticate(credential)
-                    .addOnSuccessListener(aVoid -> {
-                        // Kimlik doğrulama başarılı, şifreyi güncelle
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
                         user.updatePassword(newPassword)
-                                .addOnSuccessListener(aVoid1 -> {
+                            .addOnCompleteListener(updateTask -> {
+                                if (updateTask.isSuccessful()) {
                                     Toast.makeText(ChangePasswordActivity.this, 
-                                            "Password updated successfully", Toast.LENGTH_SHORT).show();
+                                        getString(R.string.password_changed), Toast.LENGTH_SHORT).show();
                                     finish();
-                                })
-                                .addOnFailureListener(e -> {
-                                    progressBar.setVisibility(View.GONE);
-                                    Toast.makeText(ChangePasswordActivity.this,
-                                            "Failed to update password: " + e.getMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(ChangePasswordActivity.this,
-                                "Current password is incorrect",
-                                Toast.LENGTH_SHORT).show();
-                    });
+                                } else {
+                                    Toast.makeText(ChangePasswordActivity.this, 
+                                        getString(R.string.password_change_failed), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    } else {
+                        Toast.makeText(ChangePasswordActivity.this, 
+                            getString(R.string.password_incorrect), Toast.LENGTH_SHORT).show();
+                    }
+                });
         }
     }
 } 

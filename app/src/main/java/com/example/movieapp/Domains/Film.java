@@ -4,101 +4,104 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Film implements Serializable {
-    private int Id;
-    private String Title;
-    private String Description;
-    private String Poster;
-    private String Time;
-    private String Trailer;
-    private int Imdb;
-    private int Year;
-    private ArrayList<String> Genre;
-    private ArrayList<Cast> Casts;
+    private int id;
+    private String title;
+    private String description;
+    private String poster;
+    private String time;
+    private String trailer;
+    private int imdb;
+    private int year;
+    private ArrayList<String> genre; // Tür
+    private ArrayList<Cast> casts; // Aktörler
 
+    // Boş Constructor
     public Film() {
     }
 
+    // Getter ve Setter Metodları
     public int getId() {
-        return Id;
+        return id;
     }
 
     public void setId(int id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 
     public String getPoster() {
-        return Poster;
+        return poster;
     }
 
     public void setPoster(String poster) {
-        Poster = poster;
+        this.poster = poster;
     }
 
     public String getTime() {
-        return Time;
+        return time;
     }
 
     public void setTime(String time) {
-        Time = time;
+        this.time = time;
     }
 
     public String getTrailer() {
-        return Trailer;
+        return trailer;
     }
 
     public void setTrailer(String trailer) {
-        Trailer = trailer;
+        this.trailer = trailer;
     }
 
     public int getImdb() {
-        return Imdb;
+        return imdb;
     }
 
     public void setImdb(int imdb) {
-        Imdb = imdb;
+        this.imdb = imdb;
     }
 
     public int getYear() {
-        return Year;
+        return year;
     }
 
     public void setYear(int year) {
-        Year = year;
+        this.year = year;
     }
 
     public ArrayList<String> getGenre() {
-        return Genre;
+        return genre;
     }
 
     public void setGenre(ArrayList<String> genre) {
-        Genre = genre;
+        this.genre = genre;
     }
 
     public ArrayList<Cast> getCasts() {
-        return Casts;
+        return casts;
     }
 
     public void setCasts(ArrayList<Cast> casts) {
-        Casts = casts;
+        this.casts = casts;
     }
 
     public void setPicUrl(String posterPath) {
-        Poster = posterPath;
+        this.poster = posterPath;
     }
 }
+

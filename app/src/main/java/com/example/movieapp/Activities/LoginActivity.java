@@ -9,12 +9,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.movieapp.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,16 +26,15 @@ public class LoginActivity extends AppCompatActivity {
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView;
+    TextView registerView;
 
-    public void onStart() {
+    public void onStart() {  // kullanıcı loginActivity'e her geldiğinde çalışır
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = mAuth.getCurrentUser();  // giriş yapmış kullanıcı bilgilerini alıyoruz.
         if(currentUser != null){
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
-            finish();
+            finish();  // loginActivity kapatılır, böylece kullanıcı login ekranına geri dönemez (back tuşu ile)
         }
     }
 
@@ -50,30 +45,21 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
 
+        initcomponents();
 
-        mAuth = FirebaseAuth.getInstance();
-        editTextEmail = findViewById(R.id.email);
-        editTextPassword = findViewById(R.id.password);
-        buttonLogin = findViewById(R.id.btn_login);
-        progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.registerNow);
+        setupRegisterButtonClick(); // register sayfasına yönlendir
 
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+        handleLoginButtonClick(); // Giriş yapma
+    }
 
+    private void handleLoginButtonClick() {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);  // butona tıklandığında progressBar görünür olur
                 String email, password;
-                email = String.valueOf(editTextEmail.getText());
-                password = String.valueOf(editTextPassword.getText());
+                email = String.valueOf(editTextEmail.getText()).trim();
+                password = String.valueOf(editTextPassword.getText()).trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(LoginActivity.this, "Mail Giriniz", Toast.LENGTH_SHORT).show();
@@ -101,5 +87,25 @@ public class LoginActivity extends AppCompatActivity {
                         });
             }
         });
+    }
+
+    private void setupRegisterButtonClick() {
+        registerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    private void initcomponents() {
+        mAuth = FirebaseAuth.getInstance();
+        editTextEmail = findViewById(R.id.email);
+        editTextPassword = findViewById(R.id.password);
+        buttonLogin = findViewById(R.id.btn_login);
+        progressBar = findViewById(R.id.progressBar);
+        registerView = findViewById(R.id.registerNow);
     }
 }

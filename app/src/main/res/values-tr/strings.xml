@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">MovieApp</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+
     <string name="change_password">Şifre Değiştir</string>
     <string name="dark_mode">Karanlık Mod</string>
     <string name="privacy_policy">Gizlilik Politikası</string>
@@ -7,4 +13,33 @@
     <string name="contact_us">Bize Ulaşın</string>
     <string name="logout">Çıkış Yap</string>
     <string name="language">Dil (TR/EN)</string>
+    <string name="upcoming_movies">Yaklaşan Filmler</string>
+    <string name="current_password">Mevcut Şifre</string>
+    <string name="new_password">Yeni Şifre</string>
+    <string name="confirm_password">Yeni Şifre (Tekrar)</string>
+    <string name="password_changed">Şifre başarıyla değiştirildi!</string>
+    <string name="password_change_failed">Şifre değiştirilemedi. Lütfen tekrar deneyin.</string>
+    <string name="password_mismatch">Yeni şifreler eşleşmiyor!</string>
+    <string name="password_short">Şifre en az 6 karakter uzunluğunda olmalıdır!</string>
+    <string name="password_empty">Lütfen tüm alanları doldurun!</string>
+    <string name="password_incorrect">Mevcut şifre yanlış!</string>
+    <string name="password_weak">Şifre çok zayıf!</string>
+    <string name="password_same">Yeni şifre mevcut şifre ile aynı olamaz!</string>
+
+    <!-- Main Activity Strings -->
+    <string name="search_movies">Film Ara</string>
+    <string name="top_movies">En İyi Filmler</string>
+    <string name="see_all">Tümünü Gör</string>
+    <string name="no_movies_found">Film bulunamadı</string>
+    <string name="search_failed">Arama başarısız</string>
+    <string name="network_error">Ağ hatası</string>
+    <string name="favorites_coming_soon">Favoriler yakında!</string>
+    <string name="cart_coming_soon">Sepet yakında!</string>
+    <string name="hello">Merhaba</string>
+    <string name="profile_image">Profil Resmi</string>
+
+    <!-- Bottom Navigation Strings -->
+    <string name="explorer">Keşfet</string>
+    <string name="favorites">Favoriler</string>
+    <string name="profile">Profil</string>
 </resources> 

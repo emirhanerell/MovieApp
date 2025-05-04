@@ -32,12 +32,10 @@
             android:theme="@style/Theme.MovieApp.NoActionBar" />
         <activity
             android:name=".Activities.ProfileActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MovieApp.NoActionBar" />
+            android:exported="false" />
         <activity
             android:name=".Activities.ChangePasswordActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MovieApp.NoActionBar" />
+            android:exported="false" />
         <activity
             android:name=".IntroActivity"
             android:exported="true"

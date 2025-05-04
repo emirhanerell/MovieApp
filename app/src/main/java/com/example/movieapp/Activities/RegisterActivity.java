@@ -31,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseFirestore db;
     ProgressBar progressBar;
-    TextView textView;
+    TextView loginView;
 
     public void onStart() {
         super.onStart();
@@ -48,26 +48,14 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance(); // Firestore bağlantısı
+        initcomponents();
 
-        editTextName = findViewById(R.id.nameTxt);
-        editTextSurname = findViewById(R.id.surnameTxt);
-        editTextEmail = findViewById(R.id.emailTxt);
-        editTextPassword = findViewById(R.id.passwordTxt);
-        buttonRegister = findViewById(R.id.btn_register);
-        progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.loginNow);
+        setupLoginButtonClick(); // login sayfasına yönlendir
 
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+        handleRegisterButtonClick();
+    }
 
+    private void handleRegisterButtonClick() {
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    FirebaseUser user = mAuth.getCurrentUser(); // kayıt edilen kullanıcının bilgilerini al
                                     if (user != null) {
                                         // Kullanıcı bilgilerini Firestore'a kaydetme
                                         String userId = user.getUid();
@@ -126,13 +114,13 @@ public class RegisterActivity extends AppCompatActivity {
                                                 .set(userMap)
                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                    public void onComplete(@NonNull Task<Void> task) { // userMap'i FireStore'a kaydetme
                                                         if (task.isSuccessful()) {
                                                             Toast.makeText(RegisterActivity.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                                             startActivity(intent);
                                                             finish();
-                                                        } else {
+                                                        } else { // userMap'i ekleyemezse toast gösteriyoruz.
                                                             Toast.makeText(RegisterActivity.this, "Veri kaydı başarısız oldu!", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
@@ -145,5 +133,29 @@ public class RegisterActivity extends AppCompatActivity {
                         });
             }
         });
+    }
+
+    private void setupLoginButtonClick() {
+        loginView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    private void initcomponents() {
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance(); // Firestore bağlantısı
+
+        editTextName = findViewById(R.id.nameTxt);
+        editTextSurname = findViewById(R.id.surnameTxt);
+        editTextEmail = findViewById(R.id.emailTxt);
+        editTextPassword = findViewById(R.id.passwordTxt);
+        buttonRegister = findViewById(R.id.btn_register);
+        progressBar = findViewById(R.id.progressBar);
+        loginView = findViewById(R.id.loginNow);
     }
 }

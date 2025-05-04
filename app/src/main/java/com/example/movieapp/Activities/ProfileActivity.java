@@ -93,15 +93,15 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         privacyPolicyCard.setOnClickListener(v -> {
-            Toast.makeText(this, "Privacy Policy coming soon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gizlilik Politikası yakında!", Toast.LENGTH_SHORT).show();
         });
 
         termsCard.setOnClickListener(v -> {
-            Toast.makeText(this, "Terms of Service coming soon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Hizmet Şartları yakında!", Toast.LENGTH_SHORT).show();
         });
 
         contactCard.setOnClickListener(v -> {
-            Toast.makeText(this, "Contact Us coming soon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Yakında bizimle iletişime geçin!", Toast.LENGTH_SHORT).show();
         });
 
         logoutCard.setOnClickListener(v -> {
@@ -122,11 +122,11 @@ public class ProfileActivity extends AppCompatActivity {
         boolean isDarkMode = ThemeHelper.isDarkMode(this);
         darkModeSwitch.setChecked(isDarkMode);
 
-        // Switch değiştiğinde temayı güncelle
+
         darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ThemeHelper.saveThemeMode(this, isChecked);
             ThemeHelper.applyTheme(isChecked);
-            recreate(); // Aktiviteyi yeniden oluştur
+            recreate(); // Aktif temayı uygulamak için aktiviteyi yeniden oluştur
         });
     }
 
@@ -149,10 +149,11 @@ public class ProfileActivity extends AppCompatActivity {
             conf.setLocale(newLocale);
             res.updateConfiguration(conf, dm);
 
-            // Activity'yi yeniden başlat
-            Intent refresh = new Intent(this, ProfileActivity.class);
-            finish();
+            // MainActivity'yi yeniden başlat
+            Intent refresh = new Intent(this, MainActivity.class);
+            refresh.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(refresh);
+            finish();
         });
     }
 } 

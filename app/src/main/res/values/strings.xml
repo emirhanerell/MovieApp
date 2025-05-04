@@ -14,4 +14,33 @@
     <string name="contact_us">Contact Us</string>
     <string name="logout">Logout</string>
     <string name="language">Language (TR/EN)</string>
+    <string name="upcoming_movies">Upcoming Movies</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm New Password</string>
+    <string name="password_changed">Password changed successfully!</string>
+    <string name="password_change_failed">Failed to change password. Please try again.</string>
+    <string name="password_mismatch">New passwords do not match!</string>
+    <string name="password_short">Password must be at least 6 characters long!</string>
+    <string name="password_empty">Please fill in all fields!</string>
+    <string name="password_incorrect">Current password is incorrect!</string>
+    <string name="password_weak">Password is too weak!</string>
+    <string name="password_same">New password cannot be the same as current password!</string>
+    <string name="profile_image">Profile Image</string>
+
+    <!-- Main Activity Strings -->
+    <string name="search_movies">Search Movies</string>
+    <string name="top_movies">Top Movies</string>
+    <string name="see_all">See all</string>
+    <string name="no_movies_found">No movies found</string>
+    <string name="search_failed">Search failed</string>
+    <string name="network_error">Network error</string>
+    <string name="favorites_coming_soon">Favorites coming soon!</string>
+    <string name="cart_coming_soon">Cart coming soon!</string>
+    <string name="hello">Hello</string>
+
+    <!-- Bottom Navigation Strings -->
+    <string name="explorer">Explorer</string>
+    <string name="favorites">Favorites</string>
+    <string name="profile">Profile</string>
 </resources>

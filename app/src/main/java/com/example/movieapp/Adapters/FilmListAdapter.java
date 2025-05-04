@@ -27,7 +27,6 @@ public class FilmListAdapter extends RecyclerView.Adapter<FilmListAdapter.Viewho
 
     public FilmListAdapter(ArrayList<Film> items) {
         this.items = items;
-
     }
 
     @NonNull
