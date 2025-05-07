@@ -5,6 +5,7 @@
     <string name="register">Register</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="profile_text">Profil</string>
 
     <string name="change_password">Şifre Değiştir</string>
     <string name="dark_mode">Karanlık Mod</string>

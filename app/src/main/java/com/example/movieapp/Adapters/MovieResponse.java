@@ -1,6 +1,6 @@
-package com.example.movieapp.Dto;
+package com.example.movieapp.Adapters;
 
-import com.example.movieapp.Domains.Movie;
+import com.example.movieapp.Model.Movie;
 
 import java.util.List;
 

@@ -50,8 +50,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore:25.1.2")
 
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")  // API'yi bağlamak için
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0") // JSON'u Java nesnelerine dönüştürmek için
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0") // HTTP istemcisi
 
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 

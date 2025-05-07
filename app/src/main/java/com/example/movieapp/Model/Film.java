@@ -1,4 +1,4 @@
-package com.example.movieapp.Domains;
+package com.example.movieapp.Model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -15,11 +15,10 @@ public class Film implements Serializable {
     private ArrayList<String> genre; // Tür
     private ArrayList<Cast> casts; // Aktörler
 
-    // Boş Constructor
+
     public Film() {
     }
 
-    // Getter ve Setter Metodları
     public int getId() {
         return id;
     }

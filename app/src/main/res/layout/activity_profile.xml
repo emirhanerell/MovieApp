@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
-            android:text="User Name"
+            android:text="@string/profile_text"
             android:textColor="@color/text_color"
             android:textSize="24sp"
             android:textStyle="bold" />

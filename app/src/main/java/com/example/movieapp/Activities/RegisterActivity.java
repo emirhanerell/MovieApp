@@ -114,14 +114,14 @@ public class RegisterActivity extends AppCompatActivity {
                                                 .set(userMap)
                                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
-                                                    public void onComplete(@NonNull Task<Void> task) { // userMap'i FireStore'a kaydetme
+                                                    public void onComplete(@NonNull Task<Void> task) { // oluşturduğumuz userMap'i firebase e kaydeiypruz
                                                         if (task.isSuccessful()) {
                                                             Toast.makeText(RegisterActivity.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                                             startActivity(intent);
                                                             finish();
-                                                        } else { // userMap'i ekleyemezse toast gösteriyoruz.
-                                                            Toast.makeText(RegisterActivity.this, "Veri kaydı başarısız oldu!", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(RegisterActivity.this, "Kayıt başarısız oldu!", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
                                                 });

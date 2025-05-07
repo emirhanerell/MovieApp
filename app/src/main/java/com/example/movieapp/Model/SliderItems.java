@@ -1,4 +1,4 @@
-package com.example.movieapp.Domains;
+package com.example.movieapp.Model;
 
 public class SliderItems {
     private String image;
@@ -8,11 +8,9 @@ public class SliderItems {
     private String year;
     private String time;
 
-    // Boş Constructor (Firestore vb. için lazım)
     public SliderItems() {
     }
 
-    // Tüm değişkenleri içeren constructor
     public SliderItems(String image, String name, String genre, String age, String year, String time) {
         this.image = image;
         this.name = name;
@@ -22,7 +20,6 @@ public class SliderItems {
         this.time = time;
     }
 
-    // Diğer constructor'lar (Overloading)
     public SliderItems(String image) {
         this.image = image;
     }
@@ -53,7 +50,6 @@ public class SliderItems {
         this.year = year;
     }
 
-    // Getter ve Setter metotları (Constructor'ın içinde değil!)
     public String getAge() {
         return age;
     }

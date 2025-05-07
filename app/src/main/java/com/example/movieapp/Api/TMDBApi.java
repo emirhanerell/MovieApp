@@ -1,7 +1,7 @@
 package com.example.movieapp.Api;
 
-import com.example.movieapp.Dto.MovieResponse;
-import com.example.movieapp.Domains.MovieDetail;
+import com.example.movieapp.Adapters.MovieResponse;
+import com.example.movieapp.Model.MovieDetail;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

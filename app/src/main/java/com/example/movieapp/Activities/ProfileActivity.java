@@ -141,7 +141,7 @@ public class ProfileActivity extends AppCompatActivity {
             editor.putBoolean("isTurkish", isChecked);
             editor.apply();
 
-            // Dil ayarını değiştir
+            // Dil ayarını
             Locale newLocale = isChecked ? new Locale("tr") : new Locale("en");
             Resources res = getResources();
             DisplayMetrics dm = res.getDisplayMetrics();
@@ -149,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
             conf.setLocale(newLocale);
             res.updateConfiguration(conf, dm);
 
-            // MainActivity'yi yeniden başlat
+            // MainActivity'yi yeniden başlatt
             Intent refresh = new Intent(this, MainActivity.class);
             refresh.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(refresh);

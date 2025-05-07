@@ -26,8 +26,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.movieapp.Adapters.CastListAdapter;
 import com.example.movieapp.Adapters.CategoryEachFilmAdapter;
 import com.example.movieapp.Api.TMDBApi;
-import com.example.movieapp.Domains.Film;
-import com.example.movieapp.Domains.MovieDetail;
+import com.example.movieapp.Model.Film;
+import com.example.movieapp.Model.MovieDetail;
 import com.example.movieapp.R;
 
 import java.util.ArrayList;
@@ -175,9 +175,9 @@ public class DetailActivity extends AppCompatActivity {
 
         // Cast listesini güncelle
         if (movieDetail.getCredits() != null && movieDetail.getCredits().getCast() != null) {
-            ArrayList<com.example.movieapp.Domains.Cast> castList = new ArrayList<>();
+            ArrayList<com.example.movieapp.Model.Cast> castList = new ArrayList<>();
             for (MovieDetail.Cast apiCast : movieDetail.getCredits().getCast()) {
-                com.example.movieapp.Domains.Cast cast = new com.example.movieapp.Domains.Cast();
+                com.example.movieapp.Model.Cast cast = new com.example.movieapp.Model.Cast();
                 cast.setActor(apiCast.getName());
                 cast.setPicUrl(apiCast.getProfilePath());
                 castList.add(cast);

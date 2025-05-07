@@ -25,18 +25,17 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.movieapp.Adapters.FilmListAdapter;
 import com.example.movieapp.Adapters.SlidersAdapter;
-import com.example.movieapp.Domains.Cast;
-import com.example.movieapp.Domains.Movie;
-import com.example.movieapp.Domains.MovieDetail;
-import com.example.movieapp.Dto.MovieResponse;
+import com.example.movieapp.Model.Cast;
+import com.example.movieapp.Model.Movie;
+import com.example.movieapp.Model.MovieDetail;
+import com.example.movieapp.Adapters.MovieResponse;
 import com.example.movieapp.Api.TMDBApi;
-import com.example.movieapp.Domains.Film;
-import com.example.movieapp.Domains.SliderItems;
+import com.example.movieapp.Model.Film;
+import com.example.movieapp.Model.SliderItems;
 import com.example.movieapp.R;
 import com.example.movieapp.Utils.ThemeHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -344,8 +343,7 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieDetail detail = response.body();
                     film.setTime(detail.getRuntime() + " dk");
-                    
-                    // Genre listesini güncelle
+
                     ArrayList<String> genres = new ArrayList<>();
                     if (detail.getGenres() != null) {
                         for (MovieDetail.Genre genre : detail.getGenres()) {
@@ -353,8 +351,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     film.setGenre(genres);
-                    
-                    // Cast listesini güncelle
+
                     ArrayList<Cast> casts = new ArrayList<>();
                     if (detail.getCredits() != null && detail.getCredits().getCast() != null) {
                         for (MovieDetail.Cast apiCast : detail.getCredits().getCast()) {
@@ -365,8 +362,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     film.setCasts(casts);
-                    
-                    // Adapter'ı güncelle
+
                     recyclerView.getAdapter().notifyDataSetChanged();
                 }
             }
@@ -411,8 +407,7 @@ public class MainActivity extends AppCompatActivity {
             film.setPicUrl(movie.getPosterPath());
             film.setDescription(movie.getOverview());
             film.setImdb((int) movie.getVoteAverage());
-            
-            // Yıl bilgisini release_date'den al (format: YYYY-MM-DD)
+
             String releaseDate = movie.getReleaseDate();
             if (releaseDate != null && releaseDate.length() >= 4) {
                 film.setYear(Integer.parseInt(releaseDate.substring(0, 4)));

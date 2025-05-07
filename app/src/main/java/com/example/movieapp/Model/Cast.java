@@ -1,4 +1,4 @@
-package com.example.movieapp.Domains;
+package com.example.movieapp.Model;
 
 import java.io.Serializable;
 
